@@ -1,0 +1,50 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    jcenter();
+    maven { url 'http://repo1.maven.org/maven2' }
+    maven { url 'http://jcenter.bintray.com' }
+}
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'sudohide-client'
+            keyPassword 'wiss92'
+            storeFile file('D:/Android/Projects/SudoHide/sudohide-client.jks')
+            storePassword 'wiss92'
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+    defaultConfig {
+        applicationId "com.sudocode.sudohide"
+        minSdkVersion 19
+        targetSdkVersion 23
+        versionCode 114
+        versionName "1.14"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            useProguard false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+            shrinkResources false
+            minifyEnabled false
+            useProguard false
+        }
+    }
+    dexOptions {
+        incremental false
+    }
+}
+
+dependencies {
+    provided 'de.robv.android.xposed:api:82'
+    provided 'de.robv.android.xposed:api:82:sources'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+}

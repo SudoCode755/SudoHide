@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:windowSoftInputMode="stateHidden"
+    tools:context=".AppHideConfigurationActivity">
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/subSettingsInputSearch"
+        android:layout_width="396dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:editable="true"
+        android:enabled="true"
+        android:hint="@string/search_apps"
+        android:inputType="text"
+        android:windowSoftInputMode="stateHidden" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <CheckBox
+            android:id="@+id/hide_from_system"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_weight="0.97"
+            android:checked="false"
+            android:text="@string/msg_hide_from_system_apps" />
+
+        <Button
+            android:id="@+id/configApplyButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/apply" />
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/subsettings_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
