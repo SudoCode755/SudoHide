@@ -3,6 +3,12 @@ Experimental:
 Beta:
 
 Stable:
+
+1.22
+-Re-added fast scroll on main menu
+-Added progress on spinning bar (count and percentage)
+-Code refactoring
+
 1.20
 Fixes:
 -Fixed Show System apps returning a blank list
