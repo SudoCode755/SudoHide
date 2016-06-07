@@ -10,12 +10,13 @@ import java.util.List;
 
 class AppListFilter extends Filter {
     private final AppListAdapter callingInstance;
+    private List<ApplicationData> mItemList = new ArrayList<>();
 
     public AppListFilter(AppListAdapter thisCallingInstance) {
         super();
         callingInstance = thisCallingInstance;
     }
-  private  List<ApplicationData> mItemList = new ArrayList<>();
+
     @Override
     protected FilterResults performFiltering(CharSequence constraint) {
         FilterResults filterResults = new FilterResults();

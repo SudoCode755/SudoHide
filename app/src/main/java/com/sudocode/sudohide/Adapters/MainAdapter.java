@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -50,9 +50,9 @@ public class MainAdapter extends AppListAdapter {
 
         title.setText(sTitle);
         icon.setImageDrawable(dIcon);
-       // mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.colorAccent}).getColor(0, 0)
+
         int color = appIsHidden(key) ?
-               Color.RED
+                mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.colorAccent}).getColor(0, 0)
                 : Color.WHITE;
         title.setTextColor(color);
 
@@ -72,19 +72,10 @@ public class MainAdapter extends AppListAdapter {
     private boolean appIsHidden(String packageName) {
         for (String key : mHidingConfigurationKeySet) {
             if (key.endsWith(packageName)) {
-                return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(key,false);
+                return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(key, false);
             }
         }
         return false;
     }
-
-    @Override
-    public Filter getFilter() {
-        if (filter == null) {
-            filter = new AppListFilter(this);
-        }
-        return filter;
-    }
-
 }
 

@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -100,11 +99,4 @@ public class CheckBoxAdapter extends AppListAdapter {
         }
     }
 
-    @Override
-    public Filter getFilter() {
-        if (filter == null) {
-            filter = new AppListFilter(this);
-        }
-        return filter;
-    }
 }

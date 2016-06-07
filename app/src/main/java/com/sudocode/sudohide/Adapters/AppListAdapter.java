@@ -21,7 +21,6 @@ abstract class AppListAdapter extends BaseAdapter implements Filterable {
     Filter filter;
 
 
-
     AppListAdapter(Context context, final boolean mShowSystemApps) {
         super();
         this.mContext = context;
@@ -70,4 +69,12 @@ abstract class AppListAdapter extends BaseAdapter implements Filterable {
         return mDisplayItems.get(position).hashCode();
     }
 
+
+    @Override
+    public Filter getFilter() {
+        if (filter == null) {
+            filter = new AppListFilter(this);
+        }
+        return filter;
+    }
 }

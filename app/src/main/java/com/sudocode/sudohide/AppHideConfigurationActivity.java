@@ -26,9 +26,6 @@ import static com.sudocode.sudohide.MainActivity.pref;
 
 public class AppHideConfigurationActivity extends AppCompatActivity {
 
-    //private Boolean isCheckedChanged, checkedValue;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +51,7 @@ public class AppHideConfigurationActivity extends AppCompatActivity {
         CheckBox ckbHideFromSystem = (CheckBox) findViewById(R.id.hide_from_system);
         ListView sub_listView = (ListView) findViewById(R.id.subsettings_listview);
         assert sub_listView != null;
-        
+
         final CheckBoxAdapter sub_adapter = new CheckBoxAdapter(AppHideConfigurationActivity.this, packageName);
         sub_listView.setAdapter(sub_adapter);
 

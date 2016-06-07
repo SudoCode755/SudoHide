@@ -27,6 +27,9 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
     private List<ApplicationInfo> mInstalledApplications;
     private boolean isDone = false;
     private ProgressDialog mProgressDialog;
+    private int mAppNumber;
+    private int mCurrentProgress;
+    private double mPercentage;
 
     private AppListGetter(Context thisActivity) {
         mContext = thisActivity;
@@ -38,15 +41,6 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
             instance.execute();
         }
         return instance;
-    }
-
-    private List<ApplicationData> getUserApps() {
-        if (userApps == null) {
-            this.execute();
-        } else {
-            mOnDatAvailableListener.onDataAvailable();
-        }
-        return userApps;
     }
 
     private void getAppsFromPM() {
@@ -69,16 +63,6 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
     }
 
 
-    private List<ApplicationData> getAllApps() {
-        if (allApps == null) {
-
-            this.execute();
-        } else {
-            mOnDatAvailableListener.onDataAvailable();
-        }
-        return allApps;
-    }
-
     private void SortList(List<ApplicationData> appList) {
         Collections.sort(appList);
     }
@@ -91,7 +75,9 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
         mInstalledApplications = mPackageManager.getInstalledApplications(0);
         mProgressDialog = new ProgressDialog(mContext);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setMessage(mContext.getString(R.string.loading_apps));
+        mAppNumber = mInstalledApplications.size();
+        mCurrentProgress = 0;
+        mProgressDialog.setMessage(mContext.getString(R.string.loading_apps)+"\n"+"0/"+ mAppNumber +"\n"+"0%");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.show();
@@ -115,6 +101,15 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
         mInstalledApplications.clear();
         mOnDatAvailableListener.onDataAvailable();
         isDone = true;
+    }
+
+    @Override
+    protected void onProgressUpdate(Void...params)
+    {
+        mCurrentProgress++;
+        mPercentage = ((double) mCurrentProgress)/((double)mAppNumber);
+        mProgressDialog.setMessage(mContext.getString(R.string.loading_apps)+"\n"+mCurrentProgress+"/"+mInstalledApplications.size()+"\n"+ ((int)(mPercentage*100))+"%");
+
     }
 
     public void setOnDataAvailableListener(OnDatAvailableListener onDatAvailableListener) {

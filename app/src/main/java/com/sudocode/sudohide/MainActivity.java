@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private MainAdapter mAdapter;
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,13 +159,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void restartLauncher() {
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        List<RunningAppProcessInfo> processes = am.getRunningAppProcesses();
-        for (RunningAppProcessInfo process : processes) {
-            if (!process.processName.equals(MainActivity.class.getPackage().getName())) {
-                am.killBackgroundProcesses(process.processName);
-            }
-        }
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    System.exit(0);
+                }
+            }, 5000);
+
     }
 
 

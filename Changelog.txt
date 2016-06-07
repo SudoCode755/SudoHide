@@ -1,12 +1,9 @@
+Experimental:
 
-[SIZE="4"][B][COLOR="darkorange"]Updates:[/COLOR][/B][/SIZE]
+Beta:
 
-[B][COLOR="red"]Experimental:[/COLOR][/B]
-
-[B][COLOR="orange"]Beta:[/COLOR][/B]
-
-[B][COLOR="green"]Stable:[/COLOR][/B]
-[B]1.20[/B]
+Stable:
+1.20
 Fixes:
 -Fixed Show System apps returning a blank list
 -Fixed the color markings not changing when config changes
@@ -15,23 +12,23 @@ Added:
 - Async task to handle app load
 -Loading Dialog in so the app does not seem frozen
 
-[B]1.16[/B]
+1.16
 -UI Changes added red accentuation (tell me what you think)
 -Added Xposed check to see if module is enabled.
 -code refactoring
 
-[B]1.14[/B]
+1.14
 -Added: application name color is red if app is hidden from any other app.
 -Code Refactoring
 
 
-[B]1.12[/B]
+1.12
 -Fixed Keyboard auto pop up after pressing on a list item to select from which apps  the previously selected app should hide
 -Added toast message to confirm check-box selection deselection
 -Added toast message to confirm apply changes
 -code refactoring
 
-[B]1.10[/B]
+1.10
 -Fixed Issues causing boot loops (The Horror)
 ---Null pointer exception  (BOOM!)
 ---Class cast exception
