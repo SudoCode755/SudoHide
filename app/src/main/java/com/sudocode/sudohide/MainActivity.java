@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,17 +17,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-
-
 import android.widget.ListView;
+
+import com.sudocode.sudohide.Adapters.MainAdapter;
+import com.sudocode.sudohide.Adapters.ShowConfigurationAdapter;
 
 import java.util.List;
 
 
-
 public class MainActivity extends AppCompatActivity {
 
-    private static final int OVERRIDE_MODE_WORLD_READABLE = 0x0001;
     static public SharedPreferences pref;
     private final Handler handler = new Handler();
     private ListView listView;
@@ -37,14 +37,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        pref = getSharedPreferences(BuildConfig.APPLICATION_ID + "_preferences", OVERRIDE_MODE_WORLD_READABLE);
-      /*  if (savedInstanceState == null) {
-
-        }*/
-
-
+        if (isXposedActive() == false) {
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle(R.string.app_name);
+            alertDialog.setMessage(getString(R.string.sudoHide_module_not_active));
+            alertDialog.setCancelable(false);
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Exit App", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            alertDialog.show();
+        }
+        pref = getSharedPreferences(BuildConfig.APPLICATION_ID + "_preferences", Constants.OVERRIDE_MODE_WORLD_READABLE);
+        mAdapter = new MainAdapter(this, pref.getBoolean(Constants.KEY_SHOW_SYSTEM_APP, false));
         AppCompatEditText inputSearch = (AppCompatEditText) findViewById(R.id.searchInput);
-
 
         assert inputSearch != null;
         inputSearch.addTextChangedListener(new TextWatcher() {
@@ -59,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
                                           int arg3) {
                 // TODO Auto-generated method stub
-
             }
 
             @Override
@@ -70,29 +77,27 @@ public class MainActivity extends AppCompatActivity {
 
 
         listView = (ListView) findViewById(R.id.mListView);
-
-        mAdapter = new MainAdapter(this, pref.getBoolean(Constants.KEY_SHOW_SYSTEM_APP, false));
-
+        assert listView != null;
         listView.setAdapter(mAdapter);
+
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, AppHideConfigurationActivity.class);
-                intent.putExtra(Constants.KEY_PACKAGE_NAME,mAdapter.getKey(position));
+                intent.putExtra(Constants.KEY_PACKAGE_NAME, mAdapter.getKey(position));
                 startActivity(intent);
             }
         });
-
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 final String pkgName = mAdapter.getKey(position);
 
-                View settingsDisplay = getLayoutInflater().inflate(R.layout.settingsdisplay, null,false);
+                View settingsDisplay = getLayoutInflater().inflate(R.layout.settingsdisplay, null, false);
                 ListView sub_listView = (ListView) settingsDisplay.findViewById(R.id.settingsDisplayListViewID);
-                subListAdapter subListAdapter = new subListAdapter(MainActivity.this, pkgName);
+                ShowConfigurationAdapter subListAdapter = new ShowConfigurationAdapter(MainActivity.this, pkgName);
                 sub_listView.setAdapter(subListAdapter);
 
                 new AlertDialog.Builder(MainActivity.this)
@@ -103,8 +108,12 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAdapter.notifyDataSetChanged();
     }
 
 
@@ -163,6 +172,12 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new MainAdapter(this, showSystemApp);
         listView.setAdapter(mAdapter);
 
+    }
+
+    //Method is hooked by framework.
+    @SuppressWarnings("SameReturnValue")
+    private boolean isXposedActive() {
+        return false;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.sudocode.sudohide;
+package com.sudocode.sudohide.Adapters;
 
 
 import android.content.Context;
@@ -13,9 +13,11 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sudocode.sudohide.R;
+
 import java.util.Set;
 
-class MainAdapter extends AppListAdapter {
+public class MainAdapter extends AppListAdapter {
 
     private final Set<String> mHidingConfigurationKeySet;
 
@@ -24,12 +26,11 @@ class MainAdapter extends AppListAdapter {
         super(context, showSystemApps);
         mContext = context;
         mInflater = LayoutInflater.from(context);
-
         mHidingConfigurationKeySet = PreferenceManager.getDefaultSharedPreferences(mContext).getAll().keySet();
     }
 
     public String getKey(int position) {
-        return displayItems.get(position).getKey();
+        return mDisplayItems.get(position).getKey();
     }
 
 
@@ -43,15 +44,16 @@ class MainAdapter extends AppListAdapter {
         final TextView title = (TextView) convertView.findViewById(R.id.app_name);
         final ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
 
-        final String sTitle = displayItems.get(position).getTitle();
-        final String key = displayItems.get(position).getKey();
-        final Drawable dIcon = displayItems.get(position).getIcon();
+        final String sTitle = mDisplayItems.get(position).getTitle();
+        final String key = mDisplayItems.get(position).getKey();
+        final Drawable dIcon = mDisplayItems.get(position).getIcon();
 
         title.setText(sTitle);
         icon.setImageDrawable(dIcon);
-
-
-        int color = appIsHidden(key) ? Color.RED : Color.WHITE;
+       // mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.colorAccent}).getColor(0, 0)
+        int color = appIsHidden(key) ?
+               Color.RED
+                : Color.WHITE;
         title.setTextColor(color);
 
 
@@ -70,7 +72,7 @@ class MainAdapter extends AppListAdapter {
     private boolean appIsHidden(String packageName) {
         for (String key : mHidingConfigurationKeySet) {
             if (key.endsWith(packageName)) {
-                return true;
+                return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(key,false);
             }
         }
         return false;

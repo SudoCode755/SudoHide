@@ -44,6 +44,8 @@
     <ListView
         android:id="@+id/subsettings_listview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:fastScrollEnabled="true"
+        android:choiceMode="none" />
 
 </LinearLayout>

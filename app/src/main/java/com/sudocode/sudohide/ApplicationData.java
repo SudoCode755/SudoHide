@@ -3,11 +3,11 @@ package com.sudocode.sudohide;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
-class ApplicationData implements Comparable<ApplicationData>{
+public class ApplicationData implements Comparable<ApplicationData> {
 
-    private final String title ;
-    private final String key ;
-    private final Drawable icon ;
+    private final String title;
+    private final String key;
+    private final Drawable icon;
 
     public ApplicationData(String title, String key, Drawable icon) {
         this.title = title;

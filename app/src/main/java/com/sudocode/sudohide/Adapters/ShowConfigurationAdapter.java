@@ -1,4 +1,4 @@
-package com.sudocode.sudohide;
+package com.sudocode.sudohide.Adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,10 +11,13 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sudocode.sudohide.ApplicationData;
+import com.sudocode.sudohide.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-class subListAdapter extends BaseAdapter {
+public class ShowConfigurationAdapter extends BaseAdapter {
 
 
     private final Context mContext;
@@ -22,19 +25,8 @@ class subListAdapter extends BaseAdapter {
     private final String mPackageName;
     private final List<ApplicationData> displayItems = new ArrayList<>();
     private final SharedPreferences pref;
-
-    private void populateDisplayList()
-    {
-        List<ApplicationData> allApps = AppListGetter.getInstance(mContext).getAllApps();
-        for (ApplicationData app : allApps) {
-            final String pref_key = app.getKey() + ":" + mPackageName;
-            if (pref.getBoolean(pref_key, false)) {
-                displayItems.add(app);
-            }
-        }
-    }
-
-    public subListAdapter(Context context, String packageName) {
+    private List<ApplicationData> allApps;
+    public ShowConfigurationAdapter(Context context, String packageName) {
         super();
         mContext = context;
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -43,13 +35,30 @@ class subListAdapter extends BaseAdapter {
         populateDisplayList();
     }
 
+    private void populateDisplayList() {
+        final AppListGetter appListGetter = AppListGetter.getInstance(mContext);
 
+        appListGetter.setOnDataAvailableListener(new AppListGetter.OnDatAvailableListener() {
+            @Override
+            public void onDataAvailable() {
+                allApps = appListGetter.getAvailableData(true);
+            }
+        });
+        appListGetter.callOnDataAvailable();
+
+        for (ApplicationData app : allApps) {
+            final String pref_key = app.getKey() + ":" + mPackageName;
+            if (pref.getBoolean(pref_key, false)) {
+                displayItems.add(app);
+            }
+        }
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_item, null,false);
+            convertView = mInflater.inflate(R.layout.list_item, null, false);
         }
 
         final TextView title = (TextView) convertView.findViewById(R.id.app_name);
@@ -79,7 +88,6 @@ class subListAdapter extends BaseAdapter {
     public Object getItem(int position) {
         return displayItems.get(position);
     }
-
 
 
 }

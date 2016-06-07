@@ -1,4 +1,4 @@
-package com.sudocode.sudohide;
+package com.sudocode.sudohide.Adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,19 +14,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sudocode.sudohide.R;
+
 import java.util.Map;
 import java.util.TreeMap;
 
-class CheckBoxAdapter extends AppListAdapter {
+public class CheckBoxAdapter extends AppListAdapter {
 
     private final SharedPreferences pref;
     private final String currentPkgName;
     private final Map<String, Boolean> changedItems;
     private final String currentApplicationLabel;
-
-    public Map<String, Boolean> getChangedItems() {
-        return changedItems;
-    }
 
     public CheckBoxAdapter(Context context, String pkgName) {
 
@@ -46,6 +44,9 @@ class CheckBoxAdapter extends AppListAdapter {
 
     }
 
+    public Map<String, Boolean> getChangedItems() {
+        return changedItems;
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -58,9 +59,9 @@ class CheckBoxAdapter extends AppListAdapter {
         final ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
 
 
-        final String sTitle = displayItems.get(position).getTitle();
-        final String key = displayItems.get(position).getKey();
-        final Drawable dIcon = displayItems.get(position).getIcon();
+        final String sTitle = mDisplayItems.get(position).getTitle();
+        final String key = mDisplayItems.get(position).getKey();
+        final Drawable dIcon = mDisplayItems.get(position).getIcon();
 
 
         title.setText(sTitle);
@@ -74,7 +75,6 @@ class CheckBoxAdapter extends AppListAdapter {
         } else {
             checkBox.setChecked(false);
         }
-
 
         checkBox.setOnClickListener(new View.OnClickListener() {
 

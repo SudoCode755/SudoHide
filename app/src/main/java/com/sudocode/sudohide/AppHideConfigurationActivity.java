@@ -10,11 +10,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.sudocode.sudohide.Adapters.CheckBoxAdapter;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -43,20 +46,26 @@ public class AppHideConfigurationActivity extends AppCompatActivity {
         }
         String applicationLabel = packageManager.getApplicationLabel(applicationInfo).toString().trim();
         ActionBar supportActionBar = getSupportActionBar();
-        if ((supportActionBar!=null)) {
+        if ((supportActionBar != null)) {
             supportActionBar.setTitle("Hides From");
-
-            supportActionBar.setSubtitle(applicationLabel+" Configuration");
+            supportActionBar.setSubtitle(applicationLabel + " Configuration");
         }
-
-
 
         CheckBox ckbHideFromSystem = (CheckBox) findViewById(R.id.hide_from_system);
         ListView sub_listView = (ListView) findViewById(R.id.subsettings_listview);
-
-        final CheckBoxAdapter sub_adapter = new CheckBoxAdapter(AppHideConfigurationActivity.this, packageName);
         assert sub_listView != null;
+        
+        final CheckBoxAdapter sub_adapter = new CheckBoxAdapter(AppHideConfigurationActivity.this, packageName);
         sub_listView.setAdapter(sub_adapter);
+
+        sub_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CheckBox itemCheckBock = (CheckBox) view.findViewById(R.id.chkCheckBox);
+                itemCheckBock.performClick();
+            }
+        });
+
         AppCompatEditText settingInputSearch = (AppCompatEditText) findViewById(R.id.subSettingsInputSearch);
         Button applyButton = (Button) findViewById(R.id.configApplyButton);
 
@@ -114,9 +123,8 @@ public class AppHideConfigurationActivity extends AppCompatActivity {
                     pref.edit().putBoolean(pref_key, checkedValue[0]).apply();
                     changes = true;
                 }
-                if(changes)
-                {
-                    Toast.makeText(AppHideConfigurationActivity.this,"Changes Applied",Toast.LENGTH_SHORT).show();
+                if (changes) {
+                    Toast.makeText(AppHideConfigurationActivity.this, "Changes Applied", Toast.LENGTH_SHORT).show();
                 }
             }
         });

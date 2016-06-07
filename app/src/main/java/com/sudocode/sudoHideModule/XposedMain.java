@@ -16,6 +16,7 @@ import java.util.List;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -26,10 +27,12 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
 
     private static final String ANDROID_APP_APPLICATION_PACKAGE_MANAGER_CLASS_NAME = "android.app.ApplicationPackageManager";
     private static final String X_SUDOHIDE_TAG = "XSudohide";
-
     private static XSharedPreferences pref;
     private static boolean isInitialized = false;
 
+    private static void logDebug(String msg) {
+        if (BuildConfig.DEBUG) Log.d(X_SUDOHIDE_TAG, msg);
+    }
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
@@ -50,14 +53,14 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
 
         if (pref.getBoolean(key, false)) {
 
-            //Log.d(X_SUDOHIDE_TAG, key + " true");
+            logDebug(key + " true");
             return true;
         }
         if (pref.getBoolean(key_hide_from_system, false)) {
 
             // block system processes like android.uid.systemui:10015
             if (callingName.contains(":")) {
-                //   Log.d(X_SUDOHIDE_TAG, key + " true");
+                logDebug(key + " true");
                 return true;
             }
 
@@ -66,20 +69,19 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
             ApplicationInfo info = (ApplicationInfo) XposedHelpers.callMethod(thiz, "ApplicationInfo", callingName,
                     0, Binder.getCallingUid());
             if ((info.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-                //     Log.d(X_SUDOHIDE_TAG, key + " true");
+                logDebug(key + " true");
                 return true;
             }
         }
-        // Log.d(X_SUDOHIDE_TAG, key + " false");
+        logDebug(key + " false");
         return false;
     }
 
-
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-       //Log.d(X_SUDOHIDE_TAG, "Called handleLoadPackage");
+        logDebug("Called handleLoadPackage");
         if (!isInitialized) {
-           //Log.d(X_SUDOHIDE_TAG, "handleLoadPackage: Hooking methods");
+            logDebug("handleLoadPackage: Hooking methods");
             isInitialized = true;
             Class<?> clsPMS = XposedHelpers.findClass(ANDROID_APP_APPLICATION_PACKAGE_MANAGER_CLASS_NAME, lpparam.classLoader);
 
@@ -87,8 +89,8 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
                 @Override
                 protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
-                    //    Log.d(X_SUDOHIDE_TAG, "getApplicationInfo");
-                    ModifyHookedMethodArguments(param);
+                    logDebug("getApplicationInfo");
+                    modifyHookedMethodArguments(param);
                 }
             });
 
@@ -97,8 +99,8 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
-                    //  Log.d(X_SUDOHIDE_TAG, "getPackageInfo");
-                    ModifyHookedMethodArguments(param);
+                    logDebug("getPackageInfo");
+                    modifyHookedMethodArguments(param);
                 }
             });
 
@@ -106,7 +108,7 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    //Log.d(X_SUDOHIDE_TAG, "getInstalledApplications");
+                    logDebug("getInstalledApplications");
                     modifyHookedMethodResult(param, new ApplicationInfoData());
                 }
             });
@@ -115,7 +117,7 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    //Log.d(X_SUDOHIDE_TAG, "getInstalledPackages");
+                    logDebug("getInstalledPackages");
                     modifyHookedMethodResult(param, new PackageInfoData());
                 }
             });
@@ -124,7 +126,7 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    //Log.d(X_SUDOHIDE_TAG, "getPackagesForUid");
+                    logDebug("getPackagesForUid");
                     modifyHookedMethodResult(param, new PackageNameStringData());
                 }
             });
@@ -133,7 +135,7 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    //Log.d(X_SUDOHIDE_TAG, "queryIntentActivities");
+                    logDebug("queryIntentActivities");
                     modifyHookedMethodResult(param, new ResolveInfoData());
                 }
             });
@@ -142,16 +144,20 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    //Log.d(X_SUDOHIDE_TAG, "queryIntentActivityOptions");
+                    logDebug("queryIntentActivityOptions");
                     modifyHookedMethodResult(param, new ResolveInfoData());
 
                 }
             });
 
         }
+
+        if (lpparam.packageName.equals(BuildConfig.APPLICATION_ID)) {
+            XposedHelpers.findAndHookMethod(BuildConfig.APPLICATION_ID + ".MainActivity", lpparam.classLoader, "isXposedActive", XC_MethodReplacement.returnConstant(true));
+        }
     }
 
-    private void ModifyHookedMethodArguments(XC_MethodHook.MethodHookParam param) {
+    private void modifyHookedMethodArguments(XC_MethodHook.MethodHookParam param) {
         pref.reload();
         if (shouldBlock(param.thisObject, getCallingName(param.thisObject), (String) param.args[0])) {
             param.args[0] = "";
@@ -242,6 +248,5 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
         }
 
     }
-
 
 }

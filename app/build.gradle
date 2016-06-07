@@ -21,8 +21,8 @@ android {
         applicationId "com.sudocode.sudohide"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 114
-        versionName "1.14"
+        versionCode 120
+        versionName "1.20"
     }
     buildTypes {
         release {

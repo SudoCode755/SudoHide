@@ -13,10 +13,14 @@
         android:hint="@string/search_apps"
         android:inputType="text" />
 
+
     <ListView
         android:id="@+id/mListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:choiceMode="none"
+        android:fastScrollEnabled="false"
         android:longClickable="true" />
+
 
 </LinearLayout>

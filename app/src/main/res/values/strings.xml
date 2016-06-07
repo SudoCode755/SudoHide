@@ -6,4 +6,6 @@
     <string name="msg_hide_from_system_apps">Hide from system apps (system launcher)</string>
     <string name="apply">Apply</string>
     <string name="search_apps">Search apps..</string>
+    <string name="sudoHide_module_not_active">Error Xposed framework not available! \n please check that either Xposed is correctly installed or that the module has been activated.</string>
+    <string name="loading_apps">Loading app list … \n Please wait.</string>
 </resources>
