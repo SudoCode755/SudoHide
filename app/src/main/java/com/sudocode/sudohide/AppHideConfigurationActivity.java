@@ -52,7 +52,7 @@ public class AppHideConfigurationActivity extends AppCompatActivity {
         ListView sub_listView = (ListView) findViewById(R.id.subsettings_listview);
         assert sub_listView != null;
 
-        final CheckBoxAdapter sub_adapter = new CheckBoxAdapter(AppHideConfigurationActivity.this, packageName);
+        final CheckBoxAdapter sub_adapter = new CheckBoxAdapter(AppHideConfigurationActivity.this, packageName, pref.getBoolean(Constants.KEY_SHOW_SYSTEM_APP, false));
         sub_listView.setAdapter(sub_adapter);
 
         sub_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

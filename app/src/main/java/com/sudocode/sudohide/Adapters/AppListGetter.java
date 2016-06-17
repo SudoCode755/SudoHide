@@ -29,7 +29,6 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
     private ProgressDialog mProgressDialog;
     private int mAppNumber;
     private int mCurrentProgress;
-    private double mPercentage;
 
     private AppListGetter(Context thisActivity) {
         mContext = thisActivity;
@@ -47,6 +46,7 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
 
         for (ApplicationInfo info : mInstalledApplications) {
 
+            if(isCancelled()) break;
             ApplicationData app = new ApplicationData(mPackageManager.getApplicationLabel(info).toString(), info.packageName, mPackageManager.getApplicationIcon(info));
             if (((info.flags & ApplicationInfo.FLAG_SYSTEM) == 0)) {
 
@@ -77,20 +77,28 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mAppNumber = mInstalledApplications.size();
         mCurrentProgress = 0;
-        mProgressDialog.setMessage(mContext.getString(R.string.loading_apps)+"\n"+"0/"+ mAppNumber +"\n"+"0%");
+        mProgressDialog.setMessage(mContext.getString(R.string.loading_apps) + "\n" + "0/" + mAppNumber + "\n" + "0%");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.show();
 
 
-        userApps = new ArrayList<>();
-        allApps = new ArrayList<>();
+        userApps = new ArrayList<>(mAppNumber);
+        allApps = new ArrayList<>(mAppNumber);
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         getAppsFromPM();
         return null;
+    }
+
+    @Override
+    protected void onCancelled()
+    {
+        mProgressDialog.dismiss();
+        userApps.clear();
+        allApps.clear();
     }
 
 
@@ -104,11 +112,10 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected void onProgressUpdate(Void...params)
-    {
+    protected void onProgressUpdate(Void... params) {
         mCurrentProgress++;
-        mPercentage = ((double) mCurrentProgress)/((double)mAppNumber);
-        mProgressDialog.setMessage(mContext.getString(R.string.loading_apps)+"\n"+mCurrentProgress+"/"+mInstalledApplications.size()+"\n"+ ((int)(mPercentage*100))+"%");
+        double mPercentage = ((double) mCurrentProgress) / ((double) mAppNumber);
+        mProgressDialog.setMessage(mContext.getString(R.string.loading_apps) + "\n" + mCurrentProgress + "/" + mInstalledApplications.size() + "\n" + ((int) (mPercentage * 100)) + "%");
 
     }
 
@@ -126,11 +133,7 @@ public class AppListGetter extends AsyncTask<Void, Void, Void> {
 
 
     public interface OnDatAvailableListener {
-
         void onDataAvailable();
-
-
     }
-
 
 }

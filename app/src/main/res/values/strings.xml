@@ -8,4 +8,7 @@
     <string name="search_apps">Search apps..</string>
     <string name="sudoHide_module_not_active">Error Xposed framework not available! \n please check that either Xposed is correctly installed or that the module has been activated.</string>
     <string name="loading_apps">Loading app list … \n Please wait.</string>
+    <string name="app_name_moc">App Name</string>
+    <string name="package_name_moc">package name</string>
+    <string name="action_show_package_name">Show Pacakage Name</string>
 </resources>

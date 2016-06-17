@@ -3,7 +3,6 @@ package com.sudocode.sudohide.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
@@ -13,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sudocode.sudohide.Constants;
 import com.sudocode.sudohide.R;
 
 import java.util.Set;
@@ -43,18 +43,29 @@ public class MainAdapter extends AppListAdapter {
 
         final TextView title = (TextView) convertView.findViewById(R.id.app_name);
         final ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
+        final TextView subTitle = (TextView) convertView.findViewById(R.id.package_name);
 
         final String sTitle = mDisplayItems.get(position).getTitle();
         final String key = mDisplayItems.get(position).getKey();
         final Drawable dIcon = mDisplayItems.get(position).getIcon();
 
+
         title.setText(sTitle);
         icon.setImageDrawable(dIcon);
+        String key_subTitle = key;
+        if (!PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(Constants.KEY_SHOW_PACKAGE_NAME, false)) {
+            key_subTitle = "";
+        }
+        subTitle.setText(key_subTitle);
 
-        int color = appIsHidden(key) ?
-                mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.colorAccent}).getColor(0, 0)
-                : Color.WHITE;
-        title.setTextColor(color);
+        title.setTextColor(mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.editTextColor}).getColor(0, 0));
+        subTitle.setTextColor(mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.colorControlNormal}).getColor(0, 0));
+
+        if (appIsHidden(key)) {
+            int color = mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.colorAccent}).getColor(0, 0);
+            subTitle.setTextColor(color);
+            title.setTextColor(color);
+        }
 
 
         icon.setOnClickListener(new View.OnClickListener() {

@@ -4,6 +4,11 @@ Beta:
 
 Stable:
 
+1.24
+- Fixed "Restart launcher" not working.
+- Added "Show Package Name" option
+-"Show System Apps" Now  displays system apps in both main and config views
+
 1.22
 -Re-added fast scroll on main menu
 -Added progress on spinning bar (count and percentage)

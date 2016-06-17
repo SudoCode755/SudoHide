@@ -1,12 +1,13 @@
 package com.sudocode.sudohide;
 
 import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -18,11 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.sudocode.sudohide.Adapters.AppListGetter;
 import com.sudocode.sudohide.Adapters.MainAdapter;
 import com.sudocode.sudohide.Adapters.ShowConfigurationAdapter;
-
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pref = getSharedPreferences(BuildConfig.APPLICATION_ID + "_preferences", Constants.OVERRIDE_MODE_WORLD_READABLE);
+        mAdapter = new MainAdapter(this, pref.getBoolean(Constants.KEY_SHOW_SYSTEM_APP, false));
 
         if (isXposedActive() == false) {
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -46,13 +49,12 @@ public class MainActivity extends AppCompatActivity {
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Exit App", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    AppListGetter.getInstance(MainActivity.this).cancel(true);
                     finish();
                 }
             });
             alertDialog.show();
         }
-        pref = getSharedPreferences(BuildConfig.APPLICATION_ID + "_preferences", Constants.OVERRIDE_MODE_WORLD_READABLE);
-        mAdapter = new MainAdapter(this, pref.getBoolean(Constants.KEY_SHOW_SYSTEM_APP, false));
         AppCompatEditText inputSearch = (AppCompatEditText) findViewById(R.id.searchInput);
 
         assert inputSearch != null;
@@ -124,7 +126,10 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem showSystemApps = menu.findItem(R.id.action_show_system_app);
+        MenuItem showPackageName = menu.findItem(R.id.action_show_package_name);
+
         showSystemApps.setChecked(pref.getBoolean(Constants.KEY_SHOW_SYSTEM_APP, false));
+        showPackageName.setChecked(pref.getBoolean(Constants.KEY_SHOW_PACKAGE_NAME, false));
         refresh(showSystemApps.isChecked());
         return true;
     }
@@ -134,39 +139,56 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_restart_launcher) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    restartLauncher();
-                }
-            });
-            return true;
-        } else if (id == R.id.action_show_system_app) {
 
-            boolean showSystemApps = !item.isChecked();
-            item.setChecked(showSystemApps);
-            pref.edit()
-                    .putBoolean(Constants.KEY_SHOW_SYSTEM_APP, showSystemApps)
-                    .apply();
-            refresh(showSystemApps);
+        switch (item.getItemId()) {
+            case R.id.action_restart_launcher: {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        restartLauncher();
+                    }
+                });
+                return true;
+            }
+            case R.id.action_show_system_app: {
+
+                boolean showSystemApps = !item.isChecked();
+                item.setChecked(showSystemApps);
+                pref.edit()
+                        .putBoolean(Constants.KEY_SHOW_SYSTEM_APP, showSystemApps)
+                        .apply();
+                refresh(showSystemApps);
+                return true;
+            }
+            case R.id.action_show_package_name: {
+                boolean showPackageName = !item.isChecked();
+                item.setChecked(showPackageName);
+                pref.edit()
+                        .putBoolean(Constants.KEY_SHOW_PACKAGE_NAME, showPackageName)
+                        .apply();
+                mAdapter.notifyDataSetChanged();
+                return true;
+            }
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     private void restartLauncher() {
 
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    System.exit(0);
-                }
-            }, 5000);
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PackageManager packageManager = getPackageManager();
+        ResolveInfo resolveInfo = packageManager.resolveActivity(startMain, PackageManager.MATCH_DEFAULT_ONLY);
+        ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.killBackgroundProcesses(resolveInfo.activityInfo.packageName);
+        try {
+            packageManager.getApplicationLabel(packageManager.getApplicationInfo(resolveInfo.activityInfo.packageName,0));
+            Toast.makeText(this,"Killed " + resolveInfo.activityInfo.packageName, Toast.LENGTH_SHORT).show();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
     }
 

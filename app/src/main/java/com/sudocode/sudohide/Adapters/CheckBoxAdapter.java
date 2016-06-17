@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sudocode.sudohide.Constants;
 import com.sudocode.sudohide.R;
 
 import java.util.Map;
@@ -25,9 +27,9 @@ public class CheckBoxAdapter extends AppListAdapter {
     private final Map<String, Boolean> changedItems;
     private final String currentApplicationLabel;
 
-    public CheckBoxAdapter(Context context, String pkgName) {
+    public CheckBoxAdapter(Context context, String pkgName, boolean showSystemApps) {
 
-        super(context, false);
+        super(context, showSystemApps);
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         currentPkgName = pkgName;
         changedItems = new TreeMap<>();
@@ -54,8 +56,9 @@ public class CheckBoxAdapter extends AppListAdapter {
             convertView = mInflater.inflate(R.layout.preference_checkbox, null, false);
         }
 
-        final TextView title = (TextView) convertView.findViewById(R.id.title);
+        final TextView title = (TextView) convertView.findViewById(R.id.checkbox_app_name);
         final ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+        final TextView subTitle = (TextView) convertView.findViewById(R.id.checkbox_package_name);
 
 
         final String sTitle = mDisplayItems.get(position).getTitle();
@@ -64,7 +67,15 @@ public class CheckBoxAdapter extends AppListAdapter {
 
 
         title.setText(sTitle);
+        title.setTextColor(mContext.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.editTextColor}).getColor(0, 0));
         icon.setImageDrawable(dIcon);
+
+        String key_subTitle = key;
+        if (!PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(Constants.KEY_SHOW_PACKAGE_NAME, false)) {
+            key_subTitle = "";
+        }
+
+        subTitle.setText(key_subTitle);
 
         final String pref_key = key + ":" + currentPkgName;
 
@@ -76,14 +87,13 @@ public class CheckBoxAdapter extends AppListAdapter {
         }
 
         checkBox.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 CheckBox cb = (CheckBox) v;
 
                 boolean value = cb.isChecked();
-                String ToastMessage = currentApplicationLabel + " will " + (value ? "" : "not ") + " be hidden from " + sTitle;
-                Toast.makeText(mContext, ToastMessage, Toast.LENGTH_LONG).show();
+                String toastMessage = currentApplicationLabel + " will " + (value ? "" : "not ") + " be hidden from " + sTitle;
+                Toast.makeText(mContext, toastMessage, Toast.LENGTH_SHORT).show();
                 addValue(value, pref_key);
             }
         });

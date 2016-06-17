@@ -18,7 +18,7 @@ abstract class AppListAdapter extends BaseAdapter implements Filterable {
     List<ApplicationData> mDisplayItems = new ArrayList<>();
     Context mContext;
     LayoutInflater mInflater;
-    Filter filter;
+    private Filter filter;
 
 
     AppListAdapter(Context context, final boolean mShowSystemApps) {
