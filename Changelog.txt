@@ -8,6 +8,7 @@ Stable:
 - Fixed "Restart launcher" not working.
 - Added "Show Package Name" option
 -"Show System Apps" Now  displays system apps in both main and config views
+-bug fixes and UI code enhancements
 
 1.22
 -Re-added fast scroll on main menu
