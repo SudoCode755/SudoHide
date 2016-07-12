@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">SudoHide</string>
+    <string name="action_restart_launcher">Reštartovať spúšťač</string>
+    <string name="action_show_system_apps">Zobraziť systémové aplikácie</string>
+    <string name="title_hide_app">Skryť pre aplikácie</string>
+    <string name="msg_hide_from_system_apps">Skryť zo všetkých systémových aplikácií (systémový spúštač)</string>
+    <string name="apply">Použiť</string>
+    <string name="search_apps">Vyhľadať aplikácie..</string>
+    <string name="sudoHide_module_not_active">Chyba: Xposed framework nie je dostupná! \nProsím, uistite sa, že Xposed framework je nainštalovaný a tento modul aktivovaný.</string>
+    <string name="loading_apps">Načítavanie zoznamu aplikácií… \nProsím, počkajte</string>
+    <string name="app_name_moc">Názov aplikácie</string>
+    <string name="package_name_moc">Názov balíka</string>
+    <string name="action_show_package_name">Zobraziť názov balíka</string>
+</resources>
