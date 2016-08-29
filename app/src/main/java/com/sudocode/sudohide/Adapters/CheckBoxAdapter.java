@@ -80,10 +80,13 @@ public class CheckBoxAdapter extends AppListAdapter {
         final String pref_key = key + ":" + currentPkgName;
 
         final CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.chkCheckBox);
-        if (pref.getBoolean(pref_key, false)) {
-            checkBox.setChecked(true);
-        } else {
-            checkBox.setChecked(false);
+        if(changedItems.containsKey(pref_key))
+        {
+            checkBox.setChecked(changedItems.get(pref_key));
+        }
+        else
+        {
+            checkBox.setChecked(pref.getBoolean(pref_key, false));
         }
 
         checkBox.setOnClickListener(new View.OnClickListener() {
