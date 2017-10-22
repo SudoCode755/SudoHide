@@ -3,6 +3,14 @@ Experimental:
 Beta:
 
 Stable:
+1.28
+-Android Nougat Support
+-Bug Fixes
+-Code Refactoring
+
+1.26
+-Fixed bug in filtered selection in secondary screen
+-Added SK translation (thanks to Pyler)
 
 1.24
 - Fixed "Restart launcher" not working.

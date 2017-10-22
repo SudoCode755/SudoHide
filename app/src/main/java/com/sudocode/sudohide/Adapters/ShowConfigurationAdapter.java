@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sudocode.sudohide.ApplicationData;
+import com.sudocode.sudohide.Constants;
 import com.sudocode.sudohide.R;
 
 import java.util.ArrayList;
@@ -54,12 +55,21 @@ public class ShowConfigurationAdapter extends AppListAdapter {
         }
 
         final TextView title = (TextView) convertView.findViewById(R.id.app_name);
+        final TextView subTitle = (TextView) convertView.findViewById(R.id.package_name);
+
         final ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
 
         final String sTitle = mDisplayItems.get(position).getTitle();
+        final String sSubTitle = mDisplayItems.get(position).getKey();
+
         final Drawable dIcon = mDisplayItems.get(position).getIcon();
 
         title.setText(sTitle);
+        String key_subTitle = sTitle;
+        if (!PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(Constants.KEY_SHOW_PACKAGE_NAME, false)) {
+            key_subTitle = "";
+        }
+        subTitle.setText(key_subTitle);
         icon.setImageDrawable(dIcon);
 
 

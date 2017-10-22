@@ -25,36 +25,31 @@ import com.sudocode.sudohide.Adapters.AppListGetter;
 import com.sudocode.sudohide.Adapters.MainAdapter;
 import com.sudocode.sudohide.Adapters.ShowConfigurationAdapter;
 
+import java.io.File;
 
-public class MainActivity extends AppCompatActivity {
 
-    static public SharedPreferences pref;
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    public static  SharedPreferences pref;
+    private static  final String preferencesFileName = BuildConfig.APPLICATION_ID + "_preferences";
+    private static final String preferencesRelativeDir = "/shared_prefs/";
     private final Handler handler = new Handler();
     private ListView listView;
     private MainAdapter mAdapter;
+    private File sharedPrefsFile;
 
     @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        pref = getSharedPreferences(BuildConfig.APPLICATION_ID + "_preferences", Constants.OVERRIDE_MODE_WORLD_READABLE);
+        pref = getSharedPreferences(preferencesFileName,MODE_PRIVATE);
         mAdapter = new MainAdapter(this, pref.getBoolean(Constants.KEY_SHOW_SYSTEM_APP, false));
 
-        if (isXposedActive() == false) {
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setTitle(R.string.app_name);
-            alertDialog.setMessage(getString(R.string.sudoHide_module_not_active));
-            alertDialog.setCancelable(false);
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Exit App", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    AppListGetter.getInstance(MainActivity.this).cancel(true);
-                    finish();
-                }
-            });
-            alertDialog.show();
-        }
+        pref.registerOnSharedPreferenceChangeListener(this);
+        fixDataFilesPermissions();
+
+        checkIfXposedIsActive();
         AppCompatEditText inputSearch = (AppCompatEditText) findViewById(R.id.searchInput);
 
         assert inputSearch != null;
@@ -65,17 +60,10 @@ public class MainActivity extends AppCompatActivity {
                 // When user changed the Text
                 MainActivity.this.mAdapter.getFilter().filter(cs);
             }
-
             @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-                // TODO Auto-generated method stub
-            }
-
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
             @Override
-            public void afterTextChanged(Editable arg0) {
-                // TODO Auto-generated method stub
-            }
+            public void afterTextChanged(Editable arg0) {}
         });
 
 
@@ -114,9 +102,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        mAdapter.notifyDataSetChanged();
+        fixFilePermissions(sharedPrefsFile);
+    }
+
+    private void fixDataFilesPermissions() {
+        final File packageDataDirectory = this.getApplicationContext().getFilesDir().getParentFile();
+        final File sharedPrefDirectory = new File(packageDataDirectory, preferencesRelativeDir);
+        sharedPrefsFile = new File(sharedPrefDirectory,preferencesFileName+".xml");
+
+        fixFilePermissions(packageDataDirectory);
+        fixFilePermissions(sharedPrefDirectory);
+        fixFilePermissions(sharedPrefsFile);
+    }
+
+    private void fixFilePermissions(File file) {
+        file.setReadable(true,false);
+        file.setExecutable(true,false);
+    }
+
+
+    @Override
     protected void onResume() {
         super.onResume();
         mAdapter.notifyDataSetChanged();
+        pref.registerOnSharedPreferenceChangeListener(this);
+
+    }
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        fixDataFilesPermissions();
+        pref.unregisterOnSharedPreferenceChangeListener(this);
     }
 
 
@@ -205,4 +224,20 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    private void checkIfXposedIsActive() {
+        if (false == isXposedActive()) {
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle(R.string.app_name);
+            alertDialog.setMessage(getString(R.string.sudoHide_module_not_active));
+            alertDialog.setCancelable(false);
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Exit App", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AppListGetter.getInstance(MainActivity.this).cancel(true);
+                    finish();
+                }
+            });
+            alertDialog.show();
+        }
+    }
 }

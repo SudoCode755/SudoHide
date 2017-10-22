@@ -4,11 +4,13 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.ResolveInfo;
 import android.os.Binder;
+import android.os.Environment;
 import android.util.Log;
 
 import com.sudocode.sudohide.BuildConfig;
 import com.sudocode.sudohide.Constants;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +52,7 @@ public class XposedMain implements IXposedHookLoadPackage, IXposedHookZygoteInit
     private boolean shouldBlock(Object thiz, String callingName, String queryName) {
         String key = callingName + ":" + queryName;
         String key_hide_from_system = queryName + Constants.KEY_HIDE_FROM_SYSTEM;
-
+        logDebug("can Read: "+pref.getFile().canRead());
         if (pref.getBoolean(key, false)) {
 
             logDebug(key + " true");
